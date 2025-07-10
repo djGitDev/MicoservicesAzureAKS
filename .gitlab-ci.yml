@@ -1,0 +1,37 @@
+image: docker:latest
+
+services:
+  - docker:dind
+
+variables:
+  DOCKER_DRIVER: overlay2
+
+stages:
+  - build
+  - deploy
+
+before_script:
+  - apk add --no-cache openssh
+
+build:
+  stage: build
+  script:
+    - docker compose build
+
+deploy:
+  stage: deploy
+  only:
+    - main
+  before_script:
+    - apk add --no-cache openssh
+    - eval $(ssh-agent -s)
+    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - ssh-keyscan -H $DEPLOY_SERVER >> ~/.ssh/known_hosts
+  script:
+    - ssh $DEPLOY_SERVER "
+        cd /home/tonuser/monprojet &&
+        git pull &&
+        docker compose up -d --build
+      "

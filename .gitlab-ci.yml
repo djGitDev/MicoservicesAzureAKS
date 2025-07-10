@@ -1,12 +1,17 @@
-image: docker:latest
+
+image: docker:24.0.7
 
 services:
   - name: docker:dind
-    alias: docker  # 🔧 permet DOCKER_HOST de résoudre correctement "docker"
+    alias: docker
+    # Configuration critique pour le serveur DinD
+    variables:
+      DOCKER_TLS_CERTDIR: ""          # Désactive TLS
+      DOCKER_OPTS: "-H tcp://0.0.0.0:2375"  # Force l'écoute TCP
 
 variables:
   DOCKER_HOST: tcp://docker:2375
-  DOCKER_TLS_CERTDIR: ""
+  DOCKER_TLS_CERTDIR: ""               # Désactive TLS côté client
   DOCKER_DRIVER: overlay2
 
 stages:
@@ -14,12 +19,16 @@ stages:
 
 before_script:
   - apk add --no-cache docker-cli-compose
+  # Attente critique pour la résolution DNS et la disponibilité du service
+  - timeout 60 sh -c 'until ping -c1 docker >/dev/null 2>&1; do sleep 2; echo "En attente du service Docker..."; done'
 
 build:
   stage: build
   script:
     - echo "🛠️ Construction des microservices avec Docker Compose"
     - docker compose version
-    - docker info           
+    - docker info
     - docker compose build
     - echo "✅ Build terminé"
+
+

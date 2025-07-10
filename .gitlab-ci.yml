@@ -2,7 +2,7 @@ image: docker:latest
 
 services:
   - name: docker:dind
-    alias: docker  # important pour DOCKER_HOST
+    alias: docker  # 🔧 permet DOCKER_HOST de résoudre correctement "docker"
 
 variables:
   DOCKER_HOST: tcp://docker:2375
@@ -20,6 +20,6 @@ build:
   script:
     - echo "🛠️ Construction des microservices avec Docker Compose"
     - docker compose version
-    - docker info           # vérifie que le démon Docker est accessible
+    - docker info           
     - docker compose build
     - echo "✅ Build terminé"

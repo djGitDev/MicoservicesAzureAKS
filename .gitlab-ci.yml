@@ -21,6 +21,5 @@ build:
   script:
     - echo "🛠️ Construction des microservices"
     - docker compose version
-    - docker info
     - docker compose build
     - echo "✅ Build terminé"

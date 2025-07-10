@@ -1,11 +1,11 @@
-image: docker:24.0.6
+image: docker:latest
 
 services:
   - name: docker:dind
-    command: ["--host=tcp://0.0.0.0:2375", "--host=unix:///var/run/docker.sock"]
+    alias: docker  # important pour DOCKER_HOST
 
 variables:
-  DOCKER_HOST: tcp://localhost:2375
+  DOCKER_HOST: tcp://docker:2375
   DOCKER_TLS_CERTDIR: ""
   DOCKER_DRIVER: overlay2
 
@@ -20,5 +20,6 @@ build:
   script:
     - echo "🛠️ Construction des microservices avec Docker Compose"
     - docker compose version
+    - docker info           # vérifie que le démon Docker est accessible
     - docker compose build
     - echo "✅ Build terminé"

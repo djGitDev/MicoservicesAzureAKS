@@ -3,24 +3,32 @@ image: docker:24.0.7
 
 services:
   - name: docker:dind
-    alias: docker
-    # Configuration critique pour le serveur DinD
+    alias: docker-dind  # Changement d'alias pour éviter les conflits
     variables:
-      DOCKER_TLS_CERTDIR: ""          # Désactive TLS
-      DOCKER_OPTS: "-H tcp://0.0.0.0:2375"  # Force l'écoute TCP
+      DOCKER_TLS_CERTDIR: ""
+      DOCKER_OPTS: "--host=tcp://0.0.0.0:2375"  # Format corrigé
 
 variables:
-  DOCKER_HOST: tcp://docker:2375
-  DOCKER_TLS_CERTDIR: ""               # Désactive TLS côté client
+  DOCKER_HOST: tcp://docker-dind:2375  # Utilisation du nouvel alias
+  DOCKER_TLS_CERTDIR: ""
   DOCKER_DRIVER: overlay2
 
 stages:
   - build
 
 before_script:
-  - apk add --no-cache docker-cli-compose
-  # Attente critique pour la résolution DNS et la disponibilité du service
-  - timeout 60 sh -c 'until ping -c1 docker >/dev/null 2>&1; do sleep 2; echo "En attente du service Docker..."; done'
+  - apk add --no-cache docker-cli-compose curl
+  - |
+    # Attente intelligente avec vérification TCP
+    echo "⌛ Vérification de la disponibilité du service Docker..."
+    for i in {1..30}; do
+      if curl -s --connect-timeout 2 docker-dind:2375 >/dev/null; then
+        echo "✅ Service Docker prêt"
+        break
+      fi
+      sleep 2
+      echo "⏳ Attente du service Docker ($i/30)..."
+    done
 
 build:
   stage: build

@@ -5,7 +5,7 @@ default:
       alias: docker
 
 variables:
-  DOCKER_HOST:  https://github.com/docker-library/docker/blob/d45051476babc297257df490d22cbd806f1b11e4/19.03/docker-entrypoint.sh#L23-L29
+  DOCKER_HOST:  tcp://docker:2376
 
   DOCKER_TLS_CERTDIR: "/certs"  # Activation TLS (recommandé en production)
   DOCKER_DRIVER: overlay2

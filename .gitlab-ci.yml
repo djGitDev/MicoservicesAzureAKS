@@ -22,7 +22,6 @@ before_script:
   - echo "🔒 Connexion au registre GitLab..."
   - unset DOCKER_HOST             # Désactive temporairement DinD
   - docker login $CI_REGISTRY -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
-  - export DOCKER_HOST=tcp://docker:2375  # Réactive DinD
 
 build:
   stage: build

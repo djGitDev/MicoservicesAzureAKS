@@ -36,16 +36,16 @@ jobs:
         scp microservices.tar.gz djawadAzureUser@20.55.41.167:~/microservices.tar.gz
 
     - name: Déploiement sur la VM
-  run: |
-    ssh -i ~/.ssh/id_rsa djawadAzureUser@20.55.41.167 << 'EOF'
-      mkdir -p ~/deploy_directory
-      tar -xzf ~/microservices.tar.gz -C ~/deploy_directory
-      cd ~/deploy_directory/microservicesdocker
+      run: |
+        ssh -i ~/.ssh/id_rsa djawadAzureUser@20.55.41.167 << 'EOF'
+        mkdir -p ~/deploy_directory
+        tar -xzf ~/microservices.tar.gz -C ~/deploy_directory
+        cd ~/deploy_directory/microservicesdocker
 
-      # Utiliser la bonne commande pour Docker Compose (avec ou sans tiret)
-      if command -v docker-compose &> /dev/null; then
-        docker-compose up -d --build
-      else
-        docker compose up -d --build
-      fi
-    EOF
+        # Utiliser la bonne commande pour Docker Compose (avec ou sans tiret)
+        if command -v docker-compose &> /dev/null; then
+          docker-compose up -d --build
+        else
+          docker compose up -d --build
+        fi
+        EOF

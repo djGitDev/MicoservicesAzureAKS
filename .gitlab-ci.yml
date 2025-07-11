@@ -1,19 +1,28 @@
 stages:
   - deploy
 
-deploy_ssh_server:
+deploy_to_vm:
   stage: deploy
   image: alpine:latest
-  
+  only:
+    - master
   before_script:
-    - apk add --no-cache openssh-client
-    - eval "$(ssh-agent -s)"
-    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+    - apk add --no-cache openssh tar
     - mkdir -p ~/.ssh
-    - chmod 700 ~/.ssh
+    - echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+    - chmod 600 ~/.ssh/id_rsa
     - ssh-keyscan -H "$REMOTE_HOST" >> ~/.ssh/known_hosts
   script:
-    - ssh "$DEPLOY_SERVER" "sudo apt update && sudo apt install -y openssh-server"
-    - ssh "$DEPLOY_SERVER" "sudo systemctl start ssh && sudo systemctl enable ssh"
-  only:
-    - master 
+    - echo "📦 Création de l'archive"
+    - tar -czf app.tar.gz .
+    - echo "🚀 Envoi de l'application à $REMOTE_HOST"
+    - scp app.tar.gz $REMOTE_USER@$REMOTE_HOST:~/app.tar.gz
+    - echo "🧩 Déploiement sur $REMOTE_HOST"
+    - ssh $REMOTE_USER@$REMOTE_HOST "
+        mkdir -p ~/my-app &&
+        tar -xzf ~/app.tar.gz -C ~/my-app &&
+        cd ~/my-app &&
+        docker-compose down &&
+        docker-compose up --build -d
+      "
+  

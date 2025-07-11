@@ -31,6 +31,7 @@ jobs:
 
     - name: Copy archive to VM
       run: |
+        cd ..
         ls -la
         scp microservices.tar.gz djawadAzureUser@20.55.41.167:~/microservices.tar.gz
 

@@ -1,0 +1,38 @@
+name: Deploy to Azure VM
+
+on:
+  push:
+    branches:
+      - main  # ou ta branche de production
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Setup SSH key
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        ssh-keyscan -H 20.55.41.167 >> ~/.ssh/known_hosts
+
+    - name: Create archive
+      run: |
+        tar --exclude=microservices.tar.gz -czf microservices.tar.gz microservicesdocker
+
+    - name: Copy archive to VM
+      run: |
+        scp microservices.tar.gz djawadAzureUser@20.55.41.167:~/microservices.tar.gz
+
+    - name: Deploy on VM
+      run: |
+        ssh djawadAzureUser@20.55.41.167 << 'EOF'
+          tar -xzf ~/microservices.tar.gz -C ~/deploy_directory/
+          # Ici tu peux lancer docker-compose ou tout autre script
+          cd ~/deploy_directory/microservicesdocker
+          docker-compose up -d --build
+        EOF

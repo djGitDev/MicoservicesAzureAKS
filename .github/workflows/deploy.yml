@@ -27,7 +27,7 @@ jobs:
       run: |
         cd ..
         ls -la
-        tar --exclude=microservices.tar.gz -czf microservices.tar.gz microservicesDocker
+        tar --exclude=microservices.tar.gz -czf microservices.tar.gz MicroservicesDocker
 
     - name: Copy archive to VM
       run: |

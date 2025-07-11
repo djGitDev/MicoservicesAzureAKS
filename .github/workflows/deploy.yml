@@ -19,20 +19,34 @@ jobs:
         echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
         chmod 600 ~/.ssh/id_rsa
         ssh-keyscan -H 20.55.41.167 >> ~/.ssh/known_hosts
+        ssh -o ConnectTimeout=10 -i ~/.ssh/ma-cle-azure djawadAzureUser@20.55.41.167 "echo connexion OK"
+
+
 
     - name: Create archive
       run: |
-        tar --exclude=microservices.tar.gz -czf microservices.tar.gz microservicesdocker
+        cd ..
+        ls -la
+        tar --exclude=microservices.tar.gz -czf microservices.tar.gz MicroservicesDocker
 
     - name: Copy archive to VM
       run: |
+        cd ..
+        ls -la
         scp microservices.tar.gz djawadAzureUser@20.55.41.167:~/microservices.tar.gz
 
-    - name: Deploy on VM
+    - name: Déploiement sur la VM
       run: |
-        ssh djawadAzureUser@20.55.41.167 << 'EOF'
-          tar -xzf ~/microservices.tar.gz -C ~/deploy_directory/
-          # Ici tu peux lancer docker-compose ou tout autre script
-          cd ~/deploy_directory/microservicesdocker
+        ssh -i ~/.ssh/id_rsa djawadAzureUser@20.55.41.167 << 'EOF'
+        ls -la
+        mkdir -p ~/deploy_directory
+        tar -czf microservices.tar.gz ~/deploy_directory/microservicesdocker
+        cd ~/deploy_directory/MicroservicesDocker
+        ls -la
+        # Utiliser la bonne commande pour Docker Compose (avec ou sans tiret)
+        if command -v docker-compose &> /dev/null; then
           docker-compose up -d --build
+        else
+          docker compose up -d --build
+        fi
         EOF

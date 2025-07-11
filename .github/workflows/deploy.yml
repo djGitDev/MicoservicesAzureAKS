@@ -19,6 +19,9 @@ jobs:
         echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
         chmod 600 ~/.ssh/id_rsa
         ssh-keyscan -H 20.55.41.167 >> ~/.ssh/known_hosts
+        ssh -o ConnectTimeout=10 -i ~/.ssh/ma-cle-azure djawadAzureUser@20.55.41.167 "echo connexion OK"
+
+
 
     - name: Create archive
       run: |

@@ -35,11 +35,17 @@ jobs:
         ls -la
         scp microservices.tar.gz djawadAzureUser@20.55.41.167:~/microservices.tar.gz
 
-    - name: Deploy on VM
-      run: |
-        ssh djawadAzureUser@20.55.41.167 << 'EOF'
-          tar -xzf ~/microservices.tar.gz -C ~/deploy_directory/
-          # Ici tu peux lancer docker-compose ou tout autre script
-          cd ~/deploy_directory/microservicesdocker
-          docker-compose up -d --build
-        EOF
+    - name: Déploiement sur la VM
+  run: |
+    ssh -i ~/.ssh/id_rsa djawadAzureUser@20.55.41.167 << 'EOF'
+      mkdir -p ~/deploy_directory
+      tar -xzf ~/microservices.tar.gz -C ~/deploy_directory
+      cd ~/deploy_directory/microservicesdocker
+
+      # Utiliser la bonne commande pour Docker Compose (avec ou sans tiret)
+      if command -v docker-compose &> /dev/null; then
+        docker-compose up -d --build
+      else
+        docker compose up -d --build
+      fi
+    EOF

@@ -38,10 +38,11 @@ jobs:
     - name: Déploiement sur la VM
       run: |
         ssh -i ~/.ssh/id_rsa djawadAzureUser@20.55.41.167 << 'EOF'
+        ls -la
         mkdir -p ~/deploy_directory
         tar -xzf ~/microservices.tar.gz -C ~/deploy_directory
         cd ~/deploy_directory/microservicesdocker
-
+        ls -la
         # Utiliser la bonne commande pour Docker Compose (avec ou sans tiret)
         if command -v docker-compose &> /dev/null; then
           docker-compose up -d --build

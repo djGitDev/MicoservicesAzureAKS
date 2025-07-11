@@ -40,7 +40,7 @@ jobs:
         ssh -i ~/.ssh/id_rsa djawadAzureUser@20.55.41.167 << 'EOF'
         ls -la
         mkdir -p ~/deploy_directory
-        tar -xzf ~/microservices.tar.gz -C ~/deploy_directory
+        tar -czf microservices.tar.gz ~/deploy_directory/microservicesdocker
         cd ~/deploy_directory/microservicesdocker
         ls -la
         # Utiliser la bonne commande pour Docker Compose (avec ou sans tiret)

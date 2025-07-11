@@ -41,7 +41,7 @@ jobs:
         ls -la
         mkdir -p ~/deploy_directory
         tar -czf microservices.tar.gz ~/deploy_directory/microservicesdocker
-        cd ~/deploy_directory/microservicesdocker
+        cd ~/deploy_directory
         ls -la
         # Utiliser la bonne commande pour Docker Compose (avec ou sans tiret)
         if command -v docker-compose &> /dev/null; then

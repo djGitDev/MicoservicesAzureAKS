@@ -25,6 +25,7 @@ jobs:
 
     - name: Create archive
       run: |
+        cd ..
         tar --exclude=microservices.tar.gz -czf microservices.tar.gz microservicesdocker
 
     - name: Copy archive to VM

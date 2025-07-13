@@ -8,29 +8,36 @@ jobs:
     outputs:
       changed_services: ${{ steps.detect.outputs.services }}
     steps:
-    - uses: actions/checkout@v4
-      with:
-        fetch-depth: 2  # Permet git diff
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
 
-    - name: Detect modified services
-      id: detect
-      run: |
-        SERVICE=$(git diff --name-only HEAD~1 HEAD | grep -oP '(?<=^)(frontend|python-service|node-service)(?=\/)' | sort | uniq)
-        echo "Services modifies : ${SERVICES:-aucun}"
-        echo "services=${SERVICES:-none}" >> $GITHUB_OUTPUT
+      - name: Detect modified services
+        id: detect
+        run: |
+          SERVICES=$(git diff --name-only HEAD~1 HEAD | grep -oP '^(frontend|python-service|node-service)' | sort | uniq | tr '\n' ' ')
+          echo "Services modifiés : ${SERVICES:-aucun}"
+          echo "services=${SERVICES:-none}" >> $GITHUB_OUTPUT
 
-    - name: Login to Docker Hub
-      uses: docker/login-action@v3
-      with:
-        username: ${{ secrets.DOCKER_HUB_USERNAME }}
-        password: ${{ secrets.DOCKER_HUB_TOKEN }}
+  build-and-push:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.changed_services != 'none'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
 
-    - name: Build each service
-      run: |
-            SVS=${{ needs.detect-changes.outputs.changed_services }}
-            echo ${SVS}
-            for service in ${SVS}; do
-              docker build -t djgitdev/$service:latest ./$service
-              docker push djgitdev/$service:latest
-            done
-      shell: bash
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_TOKEN }}
+
+      - name: Build and push each modified service
+        run: |
+          CHANGED="${{ needs.detect-changes.outputs.changed_services }}"
+          echo "Services modifiés : $CHANGED"
+          for service in $CHANGED; do
+            echo "🛠️ Building $service"
+            docker build -t djgitdev/$service:latest ./$service
+            docker push djgitdev/$service:latest
+          done

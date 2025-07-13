@@ -1,52 +1,26 @@
-name: Deploy to Azure VM
+name: Build and Push to Docker Hub
 
-on:
-  push:
-    branches:
-      - master  # ou ta branche de production
+on: [push]
 
 jobs:
-  deploy:
+  docker-publish:
     runs-on: ubuntu-latest
-
+    
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
-    - name: Setup SSH key
-      run: |
-        mkdir -p ~/.ssh
-        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-        chmod 600 ~/.ssh/id_rsa
-        ssh-keyscan -H 20.55.41.167 >> ~/.ssh/known_hosts
-        ssh -o ConnectTimeout=10 -i ~/.ssh/ma-cle-azure djawadAzureUser@20.55.41.167 "echo connexion OK"
+    - name: Login to Docker Hub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.DOCKER_HUB_USERNAME }}
+        password: ${{ secrets.DOCKER_HUB_TOKEN }}
 
-
-
-    - name: Create archive
-      run: |
-        cd ..
-        ls -la
-        tar --exclude=microservices.tar.gz -czf microservices.tar.gz MicroservicesDocker
-
-    - name: Copy archive to VM
-      run: |
-        cd ..
-        ls -la
-        scp microservices.tar.gz djawadAzureUser@20.55.41.167:~/microservices.tar.gz
-
-    - name: Déploiement sur la VM
-      run: |
-        ssh -i ~/.ssh/id_rsa djawadAzureUser@20.55.41.167 << 'EOF'
-        ls -la
-        mkdir -p ~/deploy_directory
-        tar -czf microservices.tar.gz ~/deploy_directory/microservicesdocker
-        cd ~/deploy_directory/MicroservicesDocker
-        ls -la
-        # Utiliser la bonne commande pour Docker Compose (avec ou sans tiret)
-        if command -v docker-compose &> /dev/null; then
-          docker-compose up -d --build
-        else
-          docker compose up -d --build
-        fi
-        EOF
+    - name: Build and push
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        push: true
+        tags: |
+          djgitdev/[NOM_IMAGE]:latest
+          djgitdev/[NOM_IMAGE]:${{ github.sha }}

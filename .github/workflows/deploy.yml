@@ -36,8 +36,23 @@ jobs:
         run: |
           CHANGED="${{ needs.detect-changes.outputs.changed_services }}"
           echo "Services modifiés : $CHANGED"
+
+          
           for service in $CHANGED; do
             echo "🛠️ Building $service"
             docker build -t djgitdev/$service:latest ./$service
             docker push djgitdev/$service:latest
           done
+       
+      - name: Login with temporary token
+        run: |
+          az login --access-token ${{ secrets.AZURE_ACCES_TEMP_TOKEN }} --tenant ${{ secrets.AZURE_TENANT_ID }}
+          az account set --subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      
+          # Exemple : lister les ressources
+          az resource list --query "[].{Name:name, Type:type}" -o table
+
+      - name: Build and push
+        run: |
+        # Vos commandes de build/déploiement...
+          

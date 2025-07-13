@@ -27,7 +27,10 @@ jobs:
 
     - name: Build each service
       run: |
-            echo "services=${SERVICES:-none}"
-            docker build -t djgitdev/${SERVICE}:latest ./${SERVICE}
-            docker push djgitdev/${SERVICE}:latest
+            SVS=${{ needs.detect-changes.outputs.changed_services }}
+            echo ${SVS}
+            for service in ${SVS}; do
+              docker build -t djgitdev/$service:latest ./$service
+              docker push djgitdev/$service:latest
+            done
       shell: bash

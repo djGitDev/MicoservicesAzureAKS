@@ -28,6 +28,7 @@ jobs:
     - name: Build each service
       run: |
         for service in ${{ needs.detect-changes.outputs.changed_services }}; do
+            echo $service
             docker build -t djgitdev/$service:latest ./$service
             docker push djgitdev/$service:latest
         done

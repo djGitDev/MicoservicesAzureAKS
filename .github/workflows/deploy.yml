@@ -27,7 +27,7 @@ jobs:
 
     - name: Build each service
       run: |
-        
-            docker build -t djgitdev/$SERVICE:latest ./$SERVICE
-            docker push djgitdev/$SERVICE:latest
+            echo "services=${SERVICES:-none}"
+            docker build -t djgitdev/${SERVICE}:latest ./${SERVICE}
+            docker push djgitdev/${SERVICE}:latest
       shell: bash

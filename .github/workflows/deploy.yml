@@ -15,7 +15,7 @@ jobs:
     - name: Detect modified services
       id: detect
       run: |
-        SERVICES=$(git diff --name-only HEAD~1 HEAD | grep -oP '(?<=^)(frontend|python-service|node-service)(?=\/)' | sort | uniq)
+        SERVICE=$(git diff --name-only HEAD~1 HEAD | grep -oP '(?<=^)(frontend|python-service|node-service)(?=\/)' | sort | uniq)
         echo "Services modifies : ${SERVICES:-aucun}"
         echo "services=${SERVICES:-none}" >> $GITHUB_OUTPUT
 
@@ -27,9 +27,7 @@ jobs:
 
     - name: Build each service
       run: |
-        for service in $SERVICES; do
-            echo $service
-            docker build -t djgitdev/$service:latest ./$service
-            docker push djgitdev/$service:latest
-        done
+        
+            docker build -t djgitdev/$SERVICE:latest ./$service
+            docker push djgitdev/$SERVICE:latest
       shell: bash

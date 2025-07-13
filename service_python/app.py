@@ -23,7 +23,16 @@ def get_connection():
         port=DB_PORT
     )
 
-@app.route('/api/status')
+@app.route('/python-service/health')
+def health_check():
+    """Endpoint de santé minimaliste pour Kubernetes"""
+    return jsonify({
+        "status": "healthy",
+        "message": "Service opérationnel"
+    }), 200
+
+
+@app.route('/python-service/api/status')
 def status():
     try:
         conn = get_connection()

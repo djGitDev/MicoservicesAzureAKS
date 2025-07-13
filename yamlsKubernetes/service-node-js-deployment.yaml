@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: /snap/kompose/19/kompose-linux-amd64 convert -f docker-compose.yml
+    kompose.version: 1.21.0 (992df58d8)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: service-node-js
+  name: service-node-js
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: service-node-js
+  strategy: {}
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: /snap/kompose/19/kompose-linux-amd64 convert -f docker-compose.yml
+        kompose.version: 1.21.0 (992df58d8)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: service-node-js
+    spec:
+      containers:
+      - env:
+        - name: PGDATABASE
+          value: mydb
+        - name: PGHOST
+          value: db
+        - name: PGPASSWORD
+          value: pass
+        - name: PGPORT
+          value: "5432"
+        - name: PGUSER
+          value: postgres
+        image: service-node-js
+        imagePullPolicy: ""
+        name: service-node-js
+        ports:
+        - containerPort: 7000
+        resources: {}
+      restartPolicy: Always
+      serviceAccountName: ""
+      volumes: null
+status: {}

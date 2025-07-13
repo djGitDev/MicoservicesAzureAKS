@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: python
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: python
+  template:
+    metadata:
+      labels:
+        app: python
+    spec:
+      containers:
+        - name: python
+          image: djgitdev/service_python:v1
+          ports:
+            - containerPort: 7001
+          env:
+            - name: PGUSER
+              value: "postgres"
+            - name: PGPASSWORD
+              value: "pass"
+            - name: PGDATABASE
+              value: "mydb"
+            - name: PGHOST
+              value: "db2"           
+            - name: PGPORT
+              value: "5433"

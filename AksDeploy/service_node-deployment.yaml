@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: node
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: node
+  template:
+    metadata:
+      labels:
+        app: node
+    spec:
+      containers:
+        - name: node
+          image: djgitdev/service_node_js:v1   # ou ton image construite
+          ports:
+            - containerPort: 7000
+          env:
+            - name: PGUSER
+              value: "postgres"
+            - name: PGPASSWORD
+              value: "pass"
+            - name: PGDATABASE
+              value: "mydb"
+            - name: PGHOST
+              value: "db1"
+            - name: PGPORT
+              value: "5432"

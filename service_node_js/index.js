@@ -7,7 +7,7 @@ const port = 7000;
 
 app.use(cors());
 
-app.get('/api/hello', async (req, res) => {
+app.get('/node-service/api/hello', async (req, res) => {
   try {
     const result = await db.query('SELECT NOW()');
     res.json({

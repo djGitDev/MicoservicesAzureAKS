@@ -8,7 +8,7 @@ function App() {
   const handleNodeClick = async () => {
     setLoading(true);
     try {
-      const res = await fetch('http://localhost:7000/api/hello');
+      const res = await fetch('node-service/api/hello');
       const data = await res.json();
       setNodeResponse(data);
     } catch (err) {
@@ -20,9 +20,14 @@ function App() {
   const handlePythonClick = async () => {
     setLoading(true);
     try {
-      const res = await fetch('http://localhost:7001/api/status');
-      const data = await res.json();
-      setPythonResponse(data);
+      const health = await fetch('python-service/health');
+    console.log("Health raw text:", await health.text());
+
+    const res = await fetch('python-service/api/status');
+    // Soit lire la réponse directement en JSON
+    const data = await res.json(); 
+    console.log("Réponse Python API:", data);
+    setPythonResponse(data);
     } catch (err) {
       setPythonResponse({ error: 'Erreur lors de la connexion au backend Python' });
     }

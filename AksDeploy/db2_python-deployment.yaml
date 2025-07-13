@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: db2
+spec:
+  selector:
+    matchLabels:
+      app: db2
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: db2
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:15
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_USER
+              value: "postgres"
+            - name: POSTGRES_PASSWORD
+              value: "pass"
+            - name: POSTGRES_DB
+              value: "mydb"
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
+          volumeMounts:
+            - name: pgdata2
+              mountPath: /var/lib/postgresql/data
+      volumes:
+        - name: pgdata2
+          persistentVolumeClaim:
+            claimName: pgdata2-pvc
